@@ -41,16 +41,7 @@ End-to-end healthcare analytics solution that transforms Medicare Part D prescri
 3. Import Medicare CSV data using SSMS
 4. Execute preprocessing procedure
 5. Connect Power BI to optimized views
-6. Refresh data model and explore reports
-
-## Project Structure
-├───sql/ # Database schema and processing scripts 
-
-├───dashboard/ # Power BI solution files 
-
-├───docs/ # ERD diagram and documentation 
-
-└───scripts/ # Deployment and automation 
+6. Refresh data model and explore reports 
 
 ## Key Healthcare Metrics
 - **Cost per Day**: Therapy efficiency measurement
@@ -71,6 +62,41 @@ End-to-end healthcare analytics solution that transforms Medicare Part D prescri
 - Data quality validation
 - Version-controlled updates
 
+## Project Structure
+Healthcare-Analytics/<br>
+├── sql/<br>
+│   ├── create_database.sql<br>
+│   ├── create_tables.sql<br>
+│   ├── stored_procedures/<br>
+│   │   ├── preprocess_data.sql<br>
+│   │   ├── refresh_job.sql<br>
+│   │   └── quality_check.sql<br>
+│   ├── functions/<br>
+│   │   ├── calculate_efficiency.sql<br>
+│   │   └── calculate_fillrate.sql<br>
+│   ├── views/<br>
+│   │   ├── powerbi_analysis.sql<br>
+│   │   └── senior_care_analysis.sql<br>
+│   ├── triggers/<br>
+│   │   └── data_validation.sql<br>
+│   ├── indexes/<br>
+│   │   └── performance_indexes.sql<br>
+│   └── business_questions/<br>
+│       └── analysis_queries.sql<br>
+├── dashboard/<br>
+│   └── Medicare_Analytics.pbix<br>
+├── docs/<br>
+│   └── ERD_Diagram.pdf<br>
+├── scripts/<br>
+│   └── setup_database.ps1<br>
+└── README.md
+
 ---
-**Demonstrated Skills**: Healthcare Analytics • SQL Optimization • Power BI • ETL Development  
-**Contact**: Ramraja Yadav | [Email](yadavramraja@outlook.com) | [LinkedIn](linkedin.com/in/ramrajayadav/)
+## Core Competencies
+**Healthcare Analytics** | **SQL Optimization** | **Power BI** | **ETL Development**  
+
+## Contact Information
+**Ramraja Yadav**  
+📧 [yadavramraja@outlook.com](mailto:yadavramraja@outlook.com)  
+👔 [LinkedIn Profile](https://linkedin.com/in/ramrajayadav)<br>
+👨‍💻 [GitHub Portfolio](https://github.com/imramraja/DataAnalyst-Portfolio)
