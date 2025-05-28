@@ -1,11 +1,9 @@
 # Database setup script
-$server = "localhost"
-$user = "sa"
-$password = "your_password"
+$server = "RAMRAJA"
 $database = "MedicarePartDAnalysis"
 
 # Create database
-sqlcmd -S $server -U $user -P $password -Q "CREATE DATABASE $database"
+sqlcmd -S $server -Q "CREATE DATABASE $database"
 
 # Create tables
 sqlcmd -S $server -U $user -P $password -d $database -i "..\sql\create_tables.sql"
