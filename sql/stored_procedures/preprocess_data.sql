@@ -13,12 +13,35 @@ BEGIN
         COALESCE(Prscrbr_Last_Org_Name, 'Unknown') + ', ' + COALESCE(Prscrbr_First_Name, ''),
         Prscrbr_State_Abrvtn,
         COALESCE(Prscrbr_Type, 'UNCLASSIFIED'),
-        ISNULL(Tot_Clms, 0),
-        ISNULL(Tot_Drug_Cst, 0.00),
-        ISNULL(Tot_Day_Suply, 0),
-        ISNULL(GE65_Tot_Clms, 0),
-        ISNULL(GE65_Tot_Drug_Cst, 0.00)
-    FROM dbo.Raw_PartD_Prescribers;
+        -- Ensure no NULLs for non-nullable columns
+        COALESCE(
+            CASE 
+                WHEN Tot_Clms IN ('*', '#') OR Tot_Clms = '' THEN 0
+                ELSE TRY_CAST(Tot_Clms AS INT) 
+            END, 0
+        ) AS Total_Claims,
+        COALESCE(
+            CASE 
+                WHEN Tot_Drug_Cst IN ('*', '#') OR Tot_Drug_Cst = '' THEN 0.00
+                ELSE TRY_CAST(Tot_Drug_Cst AS DECIMAL(15,2)) 
+            END, 0.00
+        ) AS Total_Drug_Cost,
+        COALESCE(
+            CASE 
+                WHEN Tot_Day_Suply IN ('*', '#') OR Tot_Day_Suply = '' THEN 0
+                ELSE TRY_CAST(Tot_Day_Suply AS INT) 
+            END, 0
+        ) AS Total_Day_Supply,
+        -- GE65 columns (nullable)
+        CASE 
+            WHEN GE65_Tot_Clms IN ('*', '#') OR GE65_Tot_Clms = '' THEN 0
+            ELSE TRY_CAST(GE65_Tot_Clms AS INT) 
+        END,
+        CASE 
+            WHEN GE65_Tot_Drug_Cst IN ('*', '#') OR GE65_Tot_Drug_Cst = '' THEN 0.00
+            ELSE TRY_CAST(GE65_Tot_Drug_Cst AS DECIMAL(15,2)) 
+        END
+    FROM dbo.Medicare_Part_D;
     
     PRINT 'Data preprocessing completed successfully';
 END;
