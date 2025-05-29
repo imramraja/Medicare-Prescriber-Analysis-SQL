@@ -4,15 +4,37 @@ BEGIN
     TRUNCATE TABLE dbo.Clean_PartD_Prescribers;
     
     INSERT INTO dbo.Clean_PartD_Prescribers (
-        NPI, Provider_Name, State, Provider_Type,
-        Total_Claims,Total_30day_Fills, Total_Drug_Cost, Total_Day_Supply,
-        GE65_Total_Claims, GE65_Total_Drug_Cost
+        NPI, 
+        Provider_Name, 
+        City,
+        State, 
+        State_FIPS,
+        Provider_Type,
+        Provider_Type_Src,
+        Brand_Name,
+        Generic_Name,
+        Total_Claims,
+        Total_30day_Fills, 
+        Total_Drug_Cost, 
+        Total_Day_Supply,
+        Total_Beneficiaries,
+        GE65_Supression_Flag,
+        GE65_Total_Claims, 
+        GE65_Total_Drug_Cost,
+        GE65_Total_30day_Fills,
+        GE65_Total_Day_Supply,
+        GE65_Bene_Supression_Flag
     )
     SELECT
         Prscrbr_NPI,
         COALESCE(Prscrbr_Last_Org_Name, 'Unknown') + ', ' + COALESCE(Prscrbr_First_Name, ''),
+        COALESCE(Prscrbr_City, 'Unknown'),
         Prscrbr_State_Abrvtn,
+        COALESCE(Prscrbr_State_FIPS, 0),
         COALESCE(Prscrbr_Type, 'UNCLASSIFIED'),
+        COALESCE(Prscrbr_Type_Src, 'U'),
+        COALESCE(Brnd_Name, 'Unknown'),
+        COALESCE(Gnrc_Name, 'Unknown'),
         -- Ensure no NULLs for non-nullable columns
         COALESCE(
             CASE 
@@ -38,15 +60,38 @@ BEGIN
                 ELSE TRY_CAST(Tot_Day_Suply AS INT) 
             END, 0
         ) AS Total_Day_Supply,
-        -- GE65 columns (nullable)
-        CASE 
-            WHEN GE65_Tot_Clms IN ('*', '#') OR GE65_Tot_Clms = '' THEN 0
-            ELSE TRY_CAST(GE65_Tot_Clms AS INT) 
-        END,
-        CASE 
-            WHEN GE65_Tot_Drug_Cst IN ('*', '#') OR GE65_Tot_Drug_Cst = '' THEN 0.00
-            ELSE TRY_CAST(GE65_Tot_Drug_Cst AS DECIMAL(15,2)) 
-        END
+        COALESCE(
+            CASE 
+                WHEN Tot_Benes IN ('*', '#') OR Tot_Benes = '' THEN 0
+                ELSE TRY_CAST(Tot_Benes AS INT) 
+            END, 0
+        ) AS Total_Beneficiaries,
+        COALESCE(GE65_Sprsn_Flag, 'U'),
+        COALESCE(
+            CASE 
+                WHEN GE65_Tot_Clms IN ('*', '#') OR GE65_Tot_Clms = '' THEN 0
+                ELSE TRY_CAST(GE65_Tot_Clms AS INT) 
+            END, 0
+        ) AS GE65_Total_Claims,
+        COALESCE(
+            CASE 
+                WHEN GE65_Tot_Drug_Cst IN ('*', '#') OR GE65_Tot_Drug_Cst = '' THEN 0.00
+                ELSE TRY_CAST(GE65_Tot_Drug_Cst AS DECIMAL(15,2)) 
+            END, 0.00
+        ) AS GE65_Total_Drug_Cost,
+        COALESCE(
+            CASE 
+                WHEN GE65_Tot_30day_Fills IN ('*', '#') OR GE65_Tot_30day_Fills = '' THEN 0
+                ELSE TRY_CAST(GE65_Tot_30day_Fills AS INT) 
+            END, 0
+        ) AS GE65_Total_30day_Fills,
+        COALESCE(
+            CASE 
+                WHEN GE65_Tot_Day_Suply IN ('*', '#') OR GE65_Tot_Day_Suply = '' THEN 0
+                ELSE TRY_CAST(GE65_Tot_Day_Suply AS INT) 
+            END, 0
+        ) AS GE65_Total_Day_Supply,
+        COALESCE(GE65_Bene_Sprsn_Flag, 'U')
     FROM dbo.Medicare_Part_D;
     
     PRINT 'Data preprocessing completed successfully';
