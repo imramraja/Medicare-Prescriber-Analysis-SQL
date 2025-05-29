@@ -33,6 +33,7 @@ CREATE TABLE dbo.Clean_PartD_Prescribers (
     State CHAR(2) NOT NULL,
     Provider_Type NVARCHAR(100) NOT NULL,
     Total_Claims INT NOT NULL,
+    Total_30day_Fills INT NOT NULL,
     Total_Drug_Cost DECIMAL(15,2) NOT NULL,
     Total_Day_Supply INT NOT NULL,
     GE65_Total_Claims INT,
