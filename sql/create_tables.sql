@@ -30,14 +30,24 @@ CREATE TABLE dbo.Raw_PartD_Prescribers (
 CREATE TABLE dbo.Clean_PartD_Prescribers (
     NPI BIGINT PRIMARY KEY,
     Provider_Name NVARCHAR(255) NOT NULL,
+    City NVARCHAR(100) NOT NULL,
     State CHAR(2) NOT NULL,
+    State_FIPS INT NOT NULL,
     Provider_Type NVARCHAR(100) NOT NULL,
+    Provider_Type_Src CHAR(1) NOT NULL,
+    Brand_Name NVARCHAR(255) NOT NULL,
+    Generic_Name NVARCHAR(255) NOT NULL,
     Total_Claims INT NOT NULL,
     Total_30day_Fills INT NOT NULL,
     Total_Drug_Cost DECIMAL(15,2) NOT NULL,
     Total_Day_Supply INT NOT NULL,
+    Total_Beneficiaries INT NOT NULL,
+    GE65_Supression_Flag CHAR(1) NOT NULL,
     GE65_Total_Claims INT,
     GE65_Total_Drug_Cost DECIMAL(15,2),
+    GE65_Total_30day_Fills INT,
+    GE65_Total_Day_Supply INT,
+    GE65_Bene_Supression_Flag CHAR(1),
     Cost_Per_Day AS CASE 
         WHEN Total_Day_Supply > 0 
         THEN Total_Drug_Cost / Total_Day_Supply 
