@@ -2,7 +2,7 @@ USE MedicarePartDAnalysis;
 GO
 
 -- Raw data table
-CREATE TABLE dbo.Raw_PartD_Prescribers (
+CREATE TABLE dbo.Medicare_Part_D (
     Prscrbr_NPI BIGINT,
     Prscrbr_Last_Org_Name NVARCHAR(255),
     Prscrbr_First_Name NVARCHAR(255),
