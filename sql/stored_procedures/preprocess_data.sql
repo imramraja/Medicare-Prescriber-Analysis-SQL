@@ -5,7 +5,7 @@ BEGIN
     
     INSERT INTO dbo.Clean_PartD_Prescribers (
         NPI, Provider_Name, State, Provider_Type,
-        Total_Claims, Total_Drug_Cost, Total_Day_Supply,
+        Total_Claims,Total_30day_Fills, Total_Drug_Cost, Total_Day_Supply,
         GE65_Total_Claims, GE65_Total_Drug_Cost
     )
     SELECT
@@ -20,6 +20,12 @@ BEGIN
                 ELSE TRY_CAST(Tot_Clms AS INT) 
             END, 0
         ) AS Total_Claims,
+        COALESCE(
+            CASE 
+                WHEN Tot_30day_Fills IN ('*', '#') OR Tot_30day_Fills = '' THEN 0
+                ELSE TRY_CAST(Tot_30day_Fills AS INT) 
+            END, 0
+        ) AS Total_30day_Fills,
         COALESCE(
             CASE 
                 WHEN Tot_Drug_Cst IN ('*', '#') OR Tot_Drug_Cst = '' THEN 0.00
