@@ -1,15 +1,30 @@
 CREATE PROCEDURE dbo.Preprocess_PartD_Data
 AS
 BEGIN
-    SET NOCOUNT ON;
     
     TRUNCATE TABLE dbo.Clean_PartD_Prescribers;
     
     INSERT INTO dbo.Clean_PartD_Prescribers (
-        NPI, Provider_Name, City, State, State_FIPS, Provider_Type, Provider_Type_Src,
-        Brand_Name, Generic_Name, Total_Claims, Total_30day_Fills, Total_Drug_Cost,
-        Total_Day_Supply, Total_Beneficiaries, GE65_Supression_Flag, GE65_Total_Claims,
-        GE65_Total_Drug_Cost, GE65_Total_30day_Fills, GE65_Total_Day_Supply, GE65_Bene_Supression_Flag
+        NPI, 
+        Provider_Name, 
+        City,
+        State, 
+        State_FIPS,
+        Provider_Type,
+        Provider_Type_Src,
+        Brand_Name,
+        Generic_Name,
+        Total_Claims,
+        Total_30day_Fills, 
+        Total_Drug_Cost, 
+        Total_Day_Supply,
+        Total_Beneficiaries,
+        GE65_Supression_Flag,
+        GE65_Total_Claims, 
+        GE65_Total_Drug_Cost,
+        GE65_Total_30day_Fills,
+        GE65_Total_Day_Supply,
+        GE65_Bene_Supression_Flag
     )
     SELECT
         COALESCE(TRY_CAST(Prscrbr_NPI AS BIGINT), 0) AS NPI,
