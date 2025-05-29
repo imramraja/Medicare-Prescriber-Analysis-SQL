@@ -6,7 +6,7 @@ SELECT TOP 10
     SUM(Tot_Drug_Cst) AS TotalCost,  
     SUM(Tot_Clms) AS TotalClaims,  
     FORMAT(SUM(Tot_Drug_Cst) / SUM(Tot_Clms), 'C') AS AvgCostPerClaim  
-FROM PartD_Prescribers  
+FROM dbo.Clean_PartD_Prescribers  
 GROUP BY Prscrbr_NPI, Prscrbr_Last_Org_Name, Prscrbr_Type  
 HAVING SUM(Tot_Clms) > 100  
 ORDER BY TotalCost DESC;  
@@ -18,7 +18,7 @@ SELECT
     FORMAT(SUM(CASE WHEN Gnrc_Name IS NOT NULL THEN Tot_Drug_Cst END), 'C') AS GenericCost,  
     FORMAT(100.0 * SUM(CASE WHEN Gnrc_Name IS NOT NULL THEN Tot_Drug_Cst END) /  
         NULLIF(SUM(Tot_Drug_Cst), 0), 'N1') AS GenericPenetration  
-FROM PartD_Prescribers  
+FROM dbo.Clean_PartD_Prescribers  
 GROUP BY Prscrbr_State_Abrvtn  
 HAVING SUM(Tot_Drug_Cst) > 1000000;  
 
@@ -28,7 +28,7 @@ SELECT
     FORMAT(SUM(GE65_Tot_Clms), 'N0') AS SeniorClaims,  
     FORMAT(SUM(GE65_Tot_Drug_Cst), 'C') AS SeniorCost,  
     FORMAT(100.0 * SUM(GE65_Tot_Clms) / SUM(Tot_Clms), 'N1') AS SeniorClaimPct  
-FROM PartD_Prescribers  
+FROM dbo.Clean_PartD_Prescribers  
 WHERE GE65_Sprsn_Flag = '#' AND Tot_Clms > 0  
 GROUP BY Prscrbr_Type  
 ORDER BY SeniorCost DESC;  
@@ -39,7 +39,7 @@ WITH StateData AS (
         Prscrbr_State_Abrvtn,  
         SUM(Tot_Drug_Cst) AS TotalCost,  
         AVG(1.0 * Tot_Drug_Cst / Tot_Clms) AS AvgCostPerClaim  
-    FROM PartD_Prescribers  
+    FROM dbo.Clean_PartD_Prescribers  
     WHERE Tot_Clms > 0  
     GROUP BY Prscrbr_State_Abrvtn  
 )  
@@ -48,7 +48,7 @@ SELECT
     FORMAT(TotalCost, 'C') AS TotalCost,  
     FORMAT(AvgCostPerClaim, 'C') AS AvgCostPerClaim,  
     FORMAT(AvgCostPerClaim - (SELECT AVG(1.0 * Tot_Drug_Cst / Tot_Clms)   
-        FROM PartD_Prescribers WHERE Tot_Clms > 0), 'C') AS CostVariance  
+        FROM dbo.Clean_PartD_Prescribers WHERE Tot_Clms > 0), 'C') AS CostVariance  
 FROM StateData  
 ORDER BY CostVariance DESC;  
 
@@ -61,7 +61,7 @@ SELECT
     SUM(Tot_Day_Suply) AS TotalSupply,  
     FORMAT(SUM(Tot_Drug_Cst) / SUM(Tot_Day_Suply), 'C') AS CostPerDay,  
     RANK() OVER (ORDER BY SUM(Tot_Drug_Cst) / SUM(Tot_Day_Suply) DESC) AS CostRank  
-FROM PartD_Prescribers  
+FROM dbo.Clean_PartD_Prescribers  
 WHERE Tot_Day_Suply > 0  
 GROUP BY Prscrbr_NPI, Prscrbr_Last_Org_Name, Prscrbr_Type  
 HAVING SUM(Tot_Day_Suply) > 1000;  
@@ -73,7 +73,7 @@ SELECT
     FORMAT(100.0 * SUM(GE65_Tot_30day_Fills) / SUM(GE65_Tot_Clms), 'N1') AS SeniorFillRate,  
     FORMAT((100.0 * SUM(Tot_30day_Fills) / SUM(Tot_Clms)) -  
         (100.0 * SUM(GE65_Tot_30day_Fills) / SUM(GE65_Tot_Clms)), 'N1') AS FillRateDiff  
-FROM PartD_Prescribers  
+FROM dbo.Clean_PartD_Prescribers  
 WHERE Tot_Clms > 0 AND GE65_Tot_Clms > 0  
 GROUP BY Prscrbr_Type;  
 
@@ -82,13 +82,13 @@ WITH ProviderCosts AS (
     SELECT  
         Prscrbr_NPI,  
         SUM(Tot_Drug_Cst) AS TotalCost  
-    FROM PartD_Prescribers  
+    FROM dbo.Clean_PartD_Prescribers  
     GROUP BY Prscrbr_NPI  
 )  
 SELECT  
     'Top 1%' AS Category,  
     FORMAT(SUM(TotalCost), 'C') AS TotalCost,  
-    FORMAT(100.0 * SUM(TotalCost) / (SELECT SUM(Tot_Drug_Cst) FROM PartD_Prescribers), 'N1') AS CostShare  
+    FORMAT(100.0 * SUM(TotalCost) / (SELECT SUM(Tot_Drug_Cst) FROM dbo.Clean_PartD_Prescribers), 'N1') AS CostShare  
 FROM (  
     SELECT TOP 1 PERCENT TotalCost  
     FROM ProviderCosts  
@@ -98,7 +98,7 @@ UNION ALL
 SELECT  
     'Bottom 99%',  
     FORMAT(SUM(TotalCost), 'C'),  
-    FORMAT(100.0 * SUM(TotalCost) / (SELECT SUM(Tot_Drug_Cst) FROM PartD_Prescribers), 'N1')  
+    FORMAT(100.0 * SUM(TotalCost) / (SELECT SUM(Tot_Drug_Cst) FROM dbo.Clean_PartD_Prescribers), 'N1')  
 FROM ProviderCosts  
 WHERE Prscrbr_NPI NOT IN (  
     SELECT TOP 1 PERCENT Prscrbr_NPI   
@@ -112,7 +112,7 @@ SELECT
     FORMAT(AVG(1.0 * Tot_Day_Suply / NULLIF(Tot_Clms, 0)), 'N1') AS AvgDaysPerClaim,  
     FORMAT(AVG(1.0 * GE65_Tot_Day_Suply / NULLIF(GE65_Tot_Clms, 0)), 'N1') AS SeniorDaysPerClaim,  
     FORMAT(AVG(1.0 * Tot_Drug_Cst / NULLIF(Tot_Day_Suply, 0)), 'C') AS CostPerDay  
-FROM PartD_Prescribers  
+FROM dbo.Clean_PartD_Prescribers  
 WHERE Tot_Clms > 100 AND Brnd_Name IS NOT NULL  
 GROUP BY Brnd_Name  
 HAVING AVG(1.0 * Tot_Day_Suply / NULLIF(Tot_Clms, 0)) > 0;  
@@ -124,7 +124,7 @@ SELECT
     FORMAT(STDEV(1.0 * Tot_Drug_Cst / Tot_Clms), 'C') AS StDevCost,  
     FORMAT(AVG(1.0 * Tot_Day_Suply / Tot_Clms), 'N1') AS AvgDaysPerClaim,  
     FORMAT(100.0 * SUM(GE65_Tot_Clms) / SUM(Tot_Clms), 'N1') AS SeniorClaimPct  
-FROM PartD_Prescribers  
+FROM dbo.Clean_PartD_Prescribers  
 WHERE Tot_Clms > 50  
 GROUP BY Prscrbr_Type  
 ORDER BY AvgCostPerClaim DESC;  
@@ -136,7 +136,7 @@ SELECT
     FORMAT(100.0 * SUM(GE65_Tot_Drug_Cst) / SUM(Tot_Drug_Cst), 'N1') AS SeniorCostPct,  
     FORMAT(SUM(GE65_Tot_Clms) * 1.0 / SUM(GE65_Tot_Day_Suply), 'N2') AS ClaimsPerSupplyDay,  
     RANK() OVER (ORDER BY SUM(GE65_Tot_Drug_Cst) DESC) AS CostRank  
-FROM PartD_Prescribers  
+FROM dbo.Clean_PartD_Prescribers  
 WHERE GE65_Sprsn_Flag = '#' AND Tot_Drug_Cst > 0  
 GROUP BY Prscrbr_State_Abrvtn;  
 
@@ -148,7 +148,7 @@ SELECT
     COUNT(DISTINCT Prscrbr_NPI) AS PrescriberCount,  
     FORMAT(SUM(Tot_Clms), 'N0') AS TotalClaims,  
     FORMAT(100.0 * SUM(GE65_Tot_Clms) / SUM(Tot_Clms), 'N1') AS SeniorPrescriptionRate  
-FROM PartD_Prescribers  
+FROM dbo.Clean_PartD_Prescribers  
 WHERE Brnd_Name IS NOT NULL AND Tot_Clms > 0  
 GROUP BY Brnd_Name  
 HAVING SUM(Tot_Drug_Cst) > 1000000  
@@ -161,7 +161,7 @@ SELECT
     FORMAT(SUM(GE65_Tot_Day_Suply) / SUM(GE65_Tot_Clms), 'N1') AS SeniorDaysPerClaim,  
     FORMAT(100.0 * SUM(Tot_30day_Fills) / SUM(Tot_Clms), 'N1') AS ThirtyDayFillRate,  
     FORMAT(SUM(Tot_Drug_Cst) / SUM(Tot_Day_Suply), 'C') AS CostPerDay  
-FROM PartD_Prescribers  
+FROM dbo.Clean_PartD_Prescribers  
 WHERE Tot_Clms > 0  
 GROUP BY Prscrbr_State_Abrvtn  
 ORDER BY DaysPerClaim DESC;  
@@ -172,7 +172,7 @@ SELECT
     FORMAT(AVG(1.0 * Tot_Drug_Cst / NULLIF(Tot_Benes, 0)), 'C') AS CostPerBeneficiary,  
     FORMAT(AVG(1.0 * GE65_Tot_Drug_Cst / NULLIF(GE65_Tot_Clms, 0)), 'C') AS SeniorCostPerClaim,  
     FORMAT(AVG(1.0 * Tot_Day_Suply / NULLIF(Tot_Benes, 0)), 'N1') AS DaysPerBeneficiary  
-FROM PartD_Prescribers  
+FROM dbo.Clean_PartD_Prescribers  
 WHERE Tot_Benes > 10 AND GE65_Tot_Clms > 0  
 GROUP BY Prscrbr_Type  
 ORDER BY CostPerBeneficiary DESC;  
@@ -183,7 +183,7 @@ SELECT
     FORMAT(AVG(1.0 * Tot_Clms / NULLIF(Tot_Benes, 0)), 'N1') AS ClaimsPerBeneficiary,  
     FORMAT(AVG(1.0 * Tot_Day_Suply / NULLIF(Tot_Benes, 0)), 'N1') AS DaysPerBeneficiary,  
     FORMAT(AVG(1.0 * Tot_Drug_Cst / NULLIF(Tot_Benes, 0)), 'C') AS CostPerBeneficiary  
-FROM PartD_Prescribers  
+FROM dbo.Clean_PartD_Prescribers  
 WHERE Tot_Benes > 10  
 GROUP BY Prscrbr_State_Abrvtn  
 HAVING AVG(1.0 * Tot_Clms / NULLIF(Tot_Benes, 0)) IS NOT NULL;  
@@ -194,7 +194,7 @@ SELECT
     FORMAT(AVG(1.0 * Tot_30day_Fills / Tot_Clms), 'P0') AS ThirtyDayFillRate,  
     FORMAT(AVG(1.0 * GE65_Tot_30day_Fills / GE65_Tot_Clms), 'P0') AS SeniorThirtyDayFillRate,  
     FORMAT(CORR(1.0 * Tot_30day_Fills / Tot_Clms, 1.0 * Tot_Day_Suply / Tot_Clms), 'N2') AS FillSupplyCorrelation  
-FROM PartD_Prescribers  
+FROM dbo.Clean_PartD_Prescribers  
 WHERE Tot_Clms > 50 AND GE65_Tot_Clms > 10  
 GROUP BY Prscrbr_Type;  
 
@@ -321,4 +321,4 @@ SELECT
     (Total_Drug_Cost - s.Avg_Cost) / s.StdDev_Cost AS Z_Score  
 FROM dbo.Clean_PartD_Prescribers p, Stats s  
 WHERE Provider_Type = 'Family Practice'  
-    AND ABS((Total_Drug_Cost - s.Avg_Cost) / s.StdDev_Cost) > 3;  
+    AND ABS((Total_Drug_Cost - s.Avg_Cost) / s.StdDev_Cost) > 3;
