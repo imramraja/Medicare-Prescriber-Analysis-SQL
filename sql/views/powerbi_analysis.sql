@@ -10,7 +10,7 @@ SELECT
     Total_Day_Supply,
     GE65_Total_Claims,
     GE65_Total_Drug_Cost,
-    dbo.Calculate_FillRate(Total_30day_Fills, Total_Claims) AS Fill_Rate,
+    dbo.Calculate_FillRate(Tot_30day_Fills, Total_Claims) AS Fill_Rate,
     Cost_Per_Day,
     Senior_Cost_Pct
 FROM dbo.Clean_PartD_Prescribers;
