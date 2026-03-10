@@ -1,102 +1,79 @@
-# Healthcare Analytics: Medicare Part D Prescriber Analysis
+# Healthcare Analytics: Medicare Part D Prescriber Analysis (SQL Server)
 
-## Project Overview
-End-to-end healthcare analytics solution that transforms Medicare Part D prescriber data into actionable insights for pharmaceutical strategy optimization. Features automated data processing, advanced analytics, and focused visualizations mirroring industry practices at healthcare analytics firms.
+[![SQL Server](https://img.shields.io/badge/SQL%20Server-2019+-CC2927?logo=microsoft-sql-server&logoColor=white)](https://www.microsoft.com/en-us/sql-server)
+[![ETL](https://img.shields.io/badge/ETL-SSIS-FF6C37?logo=sqlite&logoColor=white)]()
 
-## Dataset Source
-[Medicare Part D Prescribers by Provider and Drug](https://data.cms.gov/medicare-part-d-prescribers)  
-(CMS Public Dataset)
+## 📋 Project Overview
+An end-to-end healthcare analytics solution that transforms public Medicare Part D prescriber data into actionable insights for pharmaceutical strategy optimization. This project focuses entirely on **database engineering, automated ETL, and advanced SQL analytics**—mirroring industry practices at healthcare analytics firms.
 
-## Tech Stack
-- **Database**: SQL Server 2019+
-- **BI Visualization**: Power BI
-- **ETL**: SQL Server Integration Services
-- **Automation**: SQL Server Agent
-- **Version Control**: Git
+The primary goal is to analyze prescriber behavior, drug utilization, and cost efficiency using only SQL Server tools (T-SQL, SSIS, SQL Agent) to identify opportunities for cost savings and improved patient adherence.
 
-## Solution Components
-### SQL Server Implementation
-- Automated data preprocessing pipeline
-- Healthcare-specific metric calculations
-- Data quality enforcement
-- Production-ready refresh scheduling
-- 25+ analytical business questions
+## 🗃️ Dataset Source
+**Medicare Part D Prescribers by Provider and Drug** (Public CMS Dataset)
+*   **Scope:** National-level data on prescriptions written by providers and paid for under the Medicare Part D Prescription Drug Program.
+*   **Key Fields:** Prescriber details, drug brand/generic names, total claim count, days supplied, total drug costs.
 
-### Power BI Dashboard (2 Focused Pages)
-**1. Prescriber Performance Analysis**  
-- Cost efficiency metrics and matrices
-- Geographical cost heatmaps
-- Outlier detection tables
-- Provider segmentation analysis
+## 🛠️ Technology Stack
+*   **Database:** SQL Server 2019+
+*   **ETL & Automation:** SQL Server Integration Services (SSIS), SQL Server Agent
+*   **Version Control:** Git
 
-**2. Drug Utilization & Senior Care**  
-- Brand vs generic market analysis
-- Senior care cost distribution
-- Therapy adherence metrics
-- Drug cost forecasting models
+## 🏗️ Solution Architecture & Components
+The project is structured for production-level robustness, automation, and analytical depth.
 
-## Getting Started
-1. Clone repository
-2. Run database setup scripts
-3. Import Medicare CSV data using SSMS
-4. Execute preprocessing procedure
-5. Connect Power BI to optimized views
-6. Refresh data model and explore reports 
+### SQL Server Database Layer
+A comprehensive SQL implementation ensuring data integrity, performance, and reusability.
+*   **Data Definition:** `create_database.sql`, `create_tables.sql` for setting up the relational schema.
+*   **ETL & Automation:**
+    *   `stored_procedures/preprocess_data.sql`: Cleans and transforms raw CSV data.
+    *   `stored_procedures/refresh_job.sql`: Production-ready scheduled refresh using SQL Server Agent.
+    *   `scripts/setup_database.ps1`: PowerShell script for one-click environment setup.
+*   **Business Logic & Analytics:**
+    *   **Functions:** `calculate_efficiency.sql`, `calculate_fillrate.sql` for core healthcare metrics.
+    *   **Views:** `powerbi_analysis.sql`, `senior_care_analysis.sql` create optimized datasets for reporting (can be consumed by any BI tool).
+    *   **Business Questions:** `business_questions/analysis_queries.sql` contains **25+ analytical queries** solving real-world problems (e.g., top prescribers by cost, generic vs. brand utilization trends).
+*   **Data Integrity & Performance:**
+    *   `triggers/data_validation.sql`: Enforces data quality rules during insert/update.
+    *   `indexes/performance_indexes.sql`: Optimizes query performance for large datasets.
 
-## Key Healthcare Metrics
-- **Cost per Day**: Therapy efficiency measurement
-- **30-Day Fill Rate**: Medication adherence indicator
-- **Senior Cost %**: Medicare utilization analysis
-- **Therapy Consistency**: Prescribing pattern evaluation
+## 📈 Key Healthcare Metrics Defined
+*   **Cost per Day:** Calculated as `(Total Drug Cost) / (Total Days Supply)`. A key measure of therapy efficiency.
+*   **30-Day Fill Rate:** An indicator of medication adherence, calculated as the proportion of prescriptions with a days supply of 30.
+*   **Senior Cost %:** `(Cost for beneficiaries aged 65+) / (Total Cost)`. Crucial for understanding Medicare utilization.
+*   **Therapy Consistency:** Evaluating prescribing pattern variations for the same drug class across providers.
 
-## Business Value
-- Identify cost-saving opportunities
-- Optimize prescriber performance
-- Analyze senior care utilization
-- Forecast drug expenditure
-- Improve medication adherence
+## 💡 Business Value & Outcomes
+This analysis enables stakeholders to:
+*   **Identify Cost-Saving Opportunities:** Pinpoint high-cost prescribers or regions for targeted interventions.
+*   **Optimize Prescriber Performance:** Understand which provider segments are most efficient and why.
+*   **Analyze Senior Care Utilization:** Gauge the impact of the Medicare population on drug spending.
+*   **Forecast Drug Expenditure:** Build data-driven forecasts for budgeting and planning.
+*   **Improve Medication Adherence:** Identify patient groups or drugs with low fill rates to design adherence programs.
 
-## Maintenance
-- Weekly automated data refresh
-- Performance monitoring
-- Data quality validation
-- Version-controlled updates
+## ⚙️ Getting Started
+1.  **Clone the repository:** `git clone https://github.com/imramraja/Medicare-Prescriber-Analysis-SQL.git`
+2.  **Run Database Setup:** Execute `scripts/setup_database.ps1` (PowerShell) or manually run scripts in `/sql` in this order:
+    *   `create_database.sql`
+    *   `create_tables.sql`
+    *   `/indexes/performance_indexes.sql`
+3.  **Import Data:** Use SQL Server Management Studio (SSMS) to import the Medicare CSV data into the created tables.
+4.  **Run Preprocessing:** Execute the stored procedure `stored_procedures/preprocess_data.sql` to clean and prepare the data.
+5.  **Run Analysis:** Execute the queries in `business_questions/analysis_queries.sql` to generate insights.
 
-## Project Structure
-Healthcare-Analytics/<br>
-├── sql/<br>
-│   ├── create_database.sql<br>
-│   ├── create_tables.sql<br>
-│   ├── stored_procedures/<br>
-│   │   ├── preprocess_data.sql<br>
-│   │   ├── refresh_job.sql<br>
-│   │   └── quality_check.sql<br>
-│   ├── functions/<br>
-│   │   ├── calculate_efficiency.sql<br>
-│   │   └── calculate_fillrate.sql<br>
-│   ├── views/<br>
-│   │   ├── powerbi_analysis.sql<br>
-│   │   └── senior_care_analysis.sql<br>
-│   ├── triggers/<br>
-│   │   └── data_validation.sql<br>
-│   ├── indexes/<br>
-│   │   └── performance_indexes.sql<br>
-│   └── business_questions/<br>
-│       └── analysis_queries.sql<br>
-├── dashboard/<br>
-│   └── Medicare_Analytics.pbix<br>
-├── docs/<br>
-│   └── ERD_Diagram.pdf<br>
-├── scripts/<br>
-│   └── setup_database.ps1<br>
-└── README.md
+## 🔄 Maintenance
+*   **Automated Refresh:** Configured via SQL Server Agent using `stored_procedures/refresh_job.sql`.
+*   **Monitoring:** Regularly check job history and data quality validation reports.
+*   **Version Control:** All schema and script changes are tracked in this repository.
 
----
-## Core Competencies
-**Healthcare Analytics** | **SQL Optimization** | **Power BI** | **ETL Development**  
 
-## Contact Information
+## 🏆 Core Competencies Demonstrated
+*   **Healthcare Analytics:** Applying domain-specific metrics and questions to real CMS data.
+*   **Advanced SQL:** Stored procedures, functions, window queries, CTEs, query optimization.
+*   **Database Engineering:** Full schema design with triggers, indexes, and ETL processes.
+*   **Data Automation:** Building production-ready pipelines with SSIS and SQL Agent.
+
+## 📬 Contact
 **Ramraja Yadav**  
-📧 [yadavramraja@outlook.com](mailto:yadavramraja@outlook.com)  
-👔 [LinkedIn Profile](https://linkedin.com/in/ramrajayadav)<br>
-👨‍💻 [GitHub Portfolio](https://github.com/imramraja/DataAnalyst-Portfolio)
+📧 yadavramraja@outlook.com  
+👔 [LinkedIn Profile](https://www.linkedin.com/in/iamramraja/)  
+👨‍💻 [GitHub Portfolio](https://github.com/imramraja)
